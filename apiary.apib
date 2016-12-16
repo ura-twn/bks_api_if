@@ -1,0 +1,224 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# bks
+
+ユーザーと物品は1対多なので、
+紐付の情報は物品側に寄せました。
+
+エラー系の挙動、物品の詳細はまだ作成中です。
+
+## ユーザのエンドポイント [/users]
+ 
+### ユーザ登録 [POST]
+ 
+#### 処理概要
+ 
+* ユーザ情報を新しく登録する。
+* IDが重複する場合エラーで400を返す(変更はデリート→インサートでのみ)
+* 入力エラーも400を返す
+ 
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+ 
+    + Attributes
+        + userId: RTCP0000001 (string, required) - ユーザーID（pattern: ^[0-9A-Za-z]{11}$）
+        + name: 山田 太郎 (string, required) - 名前（pattern: ^.{1,30}$）
+        
++ Response 201 (application/json)
+ 
+
+
+### ユーザ情報全件取得 [GET /users]
+
+#### 処理概要
+ 
+* 登録してあるユーザー情報を全件取得
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+
++ Response 200 (application/json)
+ 
+    + Attributes
+        + user (array)
+            + (object)
+                + userId: RTCP0000001 (string, required) - ユーザーID
+                + name:  山田 太郎 (string, required) - 名前
+                + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+
+
+
+
+### ユーザ情報1件取得 [GET /users/{userId}]
+
+#### 処理概要
+ 
+* 指定されたユーザー情報を取得
+* 指定されたユーザーIDが存在しなければエラーで400返す
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+    
+    + Parameters
+ 
+       + userId: RTCP0000001 (string, required) - ユーザーID
+
++ Response 200 (application/json)
+ 
+    + Attributes
+        + user (object)
+            + userId: RTCP0000001 (string, required) - ユーザーID
+            + name:  山田 太郎 (string, required) - 名前
+            + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+
+
+
+### ユーザ削除 [DELETE /users/{userId}]
+
+
+#### 処理概要
+ 
+* 指定されたユーザー情報を削除
+* 指定されたユーザーIDが存在しなければエラーで400返す
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+    
+    + Parameters
+ 
+       + userId: RTCP0000001 (string, required) - ユーザーID
+
++ Response 204 (application/json)
+
+
+
+
+
+## 物品のエンドポイント [/equipment]
+
+以下TODOです。
+ 
+### 物品登録 [POST]
+ 
+#### 処理概要
+ 
+* 物品情報を新しく登録する。
+* IDが重複する場合エラーで400を返す(変更はデリート→インサートでのみ)
+* 入力エラーも400を返す
+ 
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+ 
+    + Attributes
+        + equipmentId: 0000001 (string, required) - 物品ID（pattern: ^[0-9A-Za-z]{7}$）
+        + name: Mac Book Pro (string, required) - 名前（pattern: ^.{1,30}$）
+        
++ Response 201 (application/json)
+
+### 物品とユーザの紐付 [PATCH /equipment/{equipmentId}]
+ 
+#### 処理概要
+ 
+* 物品情報を新しく登録する。
+* IDが重複する場合エラーで400を返す(変更はデリート→インサートでのみ)
+* 入力エラーも400を返す
+ 
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+ 
+    + Attributes
+        + equipmentId: 0000001 (string, required) - 物品ID（pattern: ^[0-9A-Za-z]{7}$）
+        + name: Mac Book Pro (string, required) - 名前（pattern: ^.{1,30}$）
+        
++ Response 201 (application/json)
+
+
+### 物品情報全件取得 [GET /equipment]
+
+#### 処理概要
+ 
+* 登録してある物品情報を全件取得
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+
++ Response 200 (application/json)
+ 
+    + Attributes
+        + equipment (array)
+            + (object)
+                + equipmentId: 0000001 (string, required) - 物品ID
+                + name: Mac Book Pro (string, required) - 名前
+                + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+
+
+
+
+### 物品情報1件取得 [GET /equipment/{equipmentId}]
+
+#### 処理概要
+ 
+* 指定された物品情報を取得
+* 指定された物品IDが存在しなければエラーで400返す
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+    
+    + Parameters
+ 
+       + equipmentId: 0000001 (string, required) - 物品ID
+
++ Response 200 (application/json)
+ 
+    + Attributes
+        + equipment (object)
+            + equipmentId: 0000001 (string, required) - 物品ID
+            + name: Mac Book Pro (string, required) - 名前
+            + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+
+
+
+### 物品削除 [DELETE /equipment/{equipmentId}]
+
+
+#### 処理概要
+ 
+* 指定された物品情報を削除
+* 指定された物品IDが存在しなければエラーで400返す
+
++ Request (application/json)
+ 
+    + Headers
+ 
+            Accept: application/json
+    
+    + Parameters
+ 
+       + equipmentId: 0000001 (string, required) - 物品ID
+
++ Response 204 (application/json)
