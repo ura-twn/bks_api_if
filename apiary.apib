@@ -6,8 +6,6 @@ HOST: http://polls.apiblueprint.org/
 ユーザーと物品は1対多なので、
 紐付の情報は物品側に寄せました。
 
-エラー系の挙動、物品の詳細はまだ作成中です。
-
 ## ユーザのエンドポイント [/users]
  
 ### ユーザ登録 [POST]
@@ -47,11 +45,11 @@ HOST: http://polls.apiblueprint.org/
 + Response 200 (application/json)
  
     + Attributes
-        + user (array)
+        + users (array)
             + (object)
                 + userId: RTCP0000001 (string, required) - ユーザーID
                 + name:  山田 太郎 (string, required) - 名前
-                + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+                + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日  (ISO 8601形式)
 
 
 
@@ -63,15 +61,17 @@ HOST: http://polls.apiblueprint.org/
 * 指定されたユーザー情報を取得
 * 指定されたユーザーIDが存在しなければエラーで400返す
 
+
+    
++ Parameters
+ 
+   + userId: RTCP0000001 (string, required) - ユーザーID
+
 + Request (application/json)
  
     + Headers
  
             Accept: application/json
-    
-    + Parameters
- 
-       + userId: RTCP0000001 (string, required) - ユーザーID
 
 + Response 200 (application/json)
  
@@ -79,7 +79,7 @@ HOST: http://polls.apiblueprint.org/
         + user (object)
             + userId: RTCP0000001 (string, required) - ユーザーID
             + name:  山田 太郎 (string, required) - 名前
-            + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+            + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日  (ISO 8601形式)
 
 
 
@@ -89,17 +89,17 @@ HOST: http://polls.apiblueprint.org/
 #### 処理概要
  
 * 指定されたユーザー情報を削除
-* 指定されたユーザーIDが存在しなければエラーで400返す
+* 指定されたユーザーIDが存在しなければそのまま正常終了
 
++ Parameters
+ 
+   + userId: RTCP0000001 (string, required) - ユーザーID
+   
 + Request (application/json)
  
     + Headers
  
             Accept: application/json
-    
-    + Parameters
- 
-       + userId: RTCP0000001 (string, required) - ユーザーID
 
 + Response 204 (application/json)
 
@@ -109,13 +109,13 @@ HOST: http://polls.apiblueprint.org/
 
 ## 物品のエンドポイント [/equipment]
 
-以下TODOです。
- 
+
 ### 物品登録 [POST]
  
 #### 処理概要
  
 * 物品情報を新しく登録する。
+* 登録時にequipmentIdを発番する。 - 物品ID（pattern: ^[0-9A-Za-z]{7}$）
 * IDが重複する場合エラーで400を返す(変更はデリート→インサートでのみ)
 * 入力エラーも400を返す
  
@@ -126,29 +126,29 @@ HOST: http://polls.apiblueprint.org/
             Accept: application/json
  
     + Attributes
-        + equipmentId: 0000001 (string, required) - 物品ID（pattern: ^[0-9A-Za-z]{7}$）
         + name: Mac Book Pro (string, required) - 名前（pattern: ^.{1,30}$）
         
 + Response 201 (application/json)
 
-### 物品とユーザの紐付 [PATCH /equipment/{equipmentId}]
+### 物品とユーザの紐付 [PATCH /equipment/{equipmentId}/users/{userId}]
  
 #### 処理概要
  
 * 物品情報を新しく登録する。
 * IDが重複する場合エラーで400を返す(変更はデリート→インサートでのみ)
 * 入力エラーも400を返す
+
++ Parameters
  
+   + equipmentId: 0000001 (string, required) - 物品ID
+   + userId: RTCP0000001 (string, required) - ユーザーID
+
 + Request (application/json)
  
     + Headers
  
             Accept: application/json
- 
-    + Attributes
-        + equipmentId: 0000001 (string, required) - 物品ID（pattern: ^[0-9A-Za-z]{7}$）
-        + name: Mac Book Pro (string, required) - 名前（pattern: ^.{1,30}$）
-        
+
 + Response 201 (application/json)
 
 
@@ -157,6 +157,8 @@ HOST: http://polls.apiblueprint.org/
 #### 処理概要
  
 * 登録してある物品情報を全件取得
+* QRコード画像へアクセスするURLはレスポインスに含める(よしなに設定できるように)
+* ユーザーと紐づいている場合、ユーザー情報を返却する
 
 + Request (application/json)
  
@@ -171,8 +173,13 @@ HOST: http://polls.apiblueprint.org/
             + (object)
                 + equipmentId: 0000001 (string, required) - 物品ID
                 + name: Mac Book Pro (string, required) - 名前
-                + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
-
+                + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日  (ISO 8601形式)
+                + updated`2016-12-16T08:00:00+09:00` (string, required) - 更新日  (ISO 8601形式)
+                + qrImageUrl /equipment/0000001/qrImages (string, required) - QRコードの画像にアクセスするURL
+                + user (object)
+                    + userId: RTCP0000001 (string, required) - ユーザーID
+                    + name:  山田 太郎 (string, required) - 名前
+                    + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日 (ISO 8601形式)
 
 
 
@@ -182,16 +189,20 @@ HOST: http://polls.apiblueprint.org/
  
 * 指定された物品情報を取得
 * 指定された物品IDが存在しなければエラーで400返す
+* QRコード画像へアクセスするURLはレスポインスに含める(よしなに設定できるように)
+* ユーザーと紐づいている場合、ユーザー情報を返却する
+
+    
++ Parameters
+ 
+   + equipmentId: 0000001 (string, required) - 物品ID
 
 + Request (application/json)
  
     + Headers
  
             Accept: application/json
-    
-    + Parameters
- 
-       + equipmentId: 0000001 (string, required) - 物品ID
+
 
 + Response 200 (application/json)
  
@@ -199,7 +210,13 @@ HOST: http://polls.apiblueprint.org/
         + equipment (object)
             + equipmentId: 0000001 (string, required) - 物品ID
             + name: Mac Book Pro (string, required) - 名前
-            + registered: `2016-12-16T08:00:00Z` (string, required) - 登録日 TODO 日付フォーマット検討
+            + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日 (ISO 8601形式)
+            + updated`2016-12-16T08:00:00+09:00` (string, required) - 更新日  (ISO 8601形式)
+            + qrImageUrl /equipment/0000001/qrImages (string, required) - QRコードの画像にアクセスするURL
+            + user (object)
+                + userId: RTCP0000001 (string, required) - ユーザーID
+                + name:  山田 太郎 (string, required) - 名前
+                + registered: `2016-12-16T08:00:00+09:00` (string, required) - 登録日  (ISO 8601形式)
 
 
 
@@ -209,16 +226,16 @@ HOST: http://polls.apiblueprint.org/
 #### 処理概要
  
 * 指定された物品情報を削除
-* 指定された物品IDが存在しなければエラーで400返す
+* 指定された物品IDが存在しなければそのまま正常終了
+
++ Parameters
+ 
+   + equipmentId: 0000001 (string, required) - 物品ID
 
 + Request (application/json)
  
     + Headers
  
             Accept: application/json
-    
-    + Parameters
- 
-       + equipmentId: 0000001 (string, required) - 物品ID
 
 + Response 204 (application/json)
